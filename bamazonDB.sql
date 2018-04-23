@@ -57,5 +57,5 @@ VALUES("Dinner Plate Set", "Kitchen", 63.50, 23);
 
 -- dummy product twelve --
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES("Drinking Glass Set", "Kitchen", 38.00, 15);
+VALUES("Drinking Glass Set", "Kitchen", 38.03, 15);
 
