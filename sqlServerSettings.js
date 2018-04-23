@@ -1,5 +1,4 @@
 console.log("SQL Server Information Loaded");
-console.log("");
 
 exports.connection = {
     host: process.env.HOST,

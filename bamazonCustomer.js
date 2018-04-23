@@ -13,7 +13,7 @@ function startApp() {
 
     connection.connect(function (err) {
         if (err) throw err;
-        console.log(`\nconnected as id ${connection.threadId}\n`);
+        console.log(`Connected to Bamazon on Session ID: ${connection.threadId}\n`);
 
         readProducts();
     });    
@@ -34,10 +34,41 @@ function readProducts() {
             productsTable.push([results[i].item_id, results[i].product_name, `$ ${results[i].price}`]);
         };
 
-        return console.log(productsTable.toString());
+        console.log(productsTable.toString());
+
+        customerAction();
         
     });    
   
 };
+
+function customerAction() {
+
+        INQUIRER
+        .prompt([
+            {
+                type: "input",
+                name: "itemID",
+                message: "Enter the Item ID of the Product you'd like to purchase:"
+            },
+            {
+                type: "input",
+                name: "quantity",
+                message: "Enter the Quantity of the Product you'd like to purchase:"
+            }
+        ]).then( function(res) {
+
+            let itemID = res.itemID;
+            let quantity = res.quantity;
+
+            connection.query("SELECT * FROM products WHERE item_id=?", [itemID], function (err, results) {
+                if (err) throw err;
+
+                console.log(`\nPlease wait while we confirm your purchase: ${res.quantity} of ${results[0].product_name} for $${results[0].price} each.`);
+            });
+
+        });
+
+}
 
 startApp();
