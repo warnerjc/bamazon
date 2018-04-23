@@ -58,16 +58,22 @@ function customerAction() {
             }
         ]).then( function(res) {
 
-            let itemID = res.itemID;
-            let quantity = res.quantity;
-
-            connection.query("SELECT * FROM products WHERE item_id=?", [itemID], function (err, results) {
-                if (err) throw err;
-
-                console.log(`\nPlease wait while we confirm your purchase: ${res.quantity} of ${results[0].product_name} for $${results[0].price} each.`);
-            });
+            processOrder(res.itemID, res.quantity);
 
         });
+
+}
+
+function processOrder(itemID, quantity) {
+
+    let processID = itemID;
+    let processQuantity = quantity;
+
+    connection.query("SELECT * FROM products WHERE item_id=?", [processID], function (err, results) {
+        if (err) throw err;
+
+        console.log(`\nPlease wait while we confirm your purchase: ${res.quantity} of ${results[0].product_name} for $${results[0].price} each.`);
+    });
 
 }
 
