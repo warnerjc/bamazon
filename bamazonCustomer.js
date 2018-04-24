@@ -69,11 +69,25 @@ function processOrder(itemID, quantity) {
     let processID = itemID;
     let processQuantity = quantity;
 
-    connection.query("SELECT * FROM products WHERE item_id=?", [processID], function (err, results) {
+    connection.query("SELECT product_name, stock_quantity, price FROM products WHERE item_id=?", [processID], function (err, results) {
         if (err) throw err;
 
-        console.log(`\nPlease wait while we confirm your purchase: ${res.quantity} of ${results[0].product_name} for $${results[0].price} each.`);
+        console.log(`\nPlease wait while we confirm your purchase: ${processQuantity} of ${results[0].product_name} for $${results[0].price} each.`);
+
+        checkStock(results[0].stock_quantity);
+
+
     });
+
+    function checkStock(stockQuantity) {
+
+        if (processQuantity <= stockQuantity) {
+            return console.log("Good news, your order went through.");
+        } else {
+            return console.log("Bad news, we don't enough stock to process your order.");
+        };
+
+    };
 
 }
 
