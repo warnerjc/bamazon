@@ -16,14 +16,14 @@ function startApp() {
         console.log(`Connected to Bamazon on Session ID: ${connection.threadId}\n`);
 
         readProducts();
-    });    
+    });
 
 };
 
 function readProducts() {
 
     var productsTable = new TABLE({
-        head: ["Item ID", "Product Name", "Product Cost"], 
+        head: ["Item ID", "Product Name", "Product Cost"],
         colWidths: [10, 105, 15]
     });
 
@@ -34,17 +34,17 @@ function readProducts() {
             productsTable.push([results[i].item_id, results[i].product_name, `$ ${results[i].price}`]);
         };
 
-        console.log(productsTable.toString());
+        console.log(`\n${productsTable.toString()}`);
 
         customerAction();
-        
-    });    
-  
+
+    });
+
 };
 
 function customerAction() {
 
-        INQUIRER
+    INQUIRER
         .prompt([
             {
                 type: "input",
@@ -56,39 +56,61 @@ function customerAction() {
                 name: "quantity",
                 message: "Enter the Quantity of the Product you'd like to purchase:"
             }
-        ]).then( function(res) {
+        ]).then(function (res) {
 
-            processOrder(res.itemID, res.quantity);
+            checkOrder(res.itemID, res.quantity);
 
         });
 
 }
 
-function processOrder(itemID, quantity) {
+function checkOrder(itemID, quantity) {
 
-    let processID = itemID;
-    let processQuantity = quantity;
-
-    connection.query("SELECT product_name, stock_quantity, price FROM products WHERE item_id=?", [processID], function (err, results) {
+    connection.query("SELECT product_name, stock_quantity, price FROM products WHERE item_id=?", [itemID], function (err, results) {
         if (err) throw err;
 
-        console.log(`\nPlease wait while we confirm your purchase: ${processQuantity} of ${results[0].product_name} for $${results[0].price} each.`);
+        console.log(`\nPlease wait while we confirm your purchase: ${quantity} of ${results[0].product_name} for $${results[0].price} each.`);
 
-        checkStock(results[0].stock_quantity);
-
-
-    });
-
-    function checkStock(stockQuantity) {
-
-        if (processQuantity <= stockQuantity) {
-            return console.log("Good news, your order went through.");
+        if (!checkStock(quantity, results[0].stock_quantity)) {
+            console.log(`\nUnfortunately, we don't have enough stock to fulfill your order.`);
+            readProducts();
         } else {
-            return console.log("Bad news, we don't enough stock to process your order.");
-        };
+            processOrder(itemID, quantity, results[0].stock_quantity, results[0].product_name, results[0].price, function(err, res) {
+                if(res) { 
+                    console.log(`\nYour order was succesfully processed for ${quantity} of ${results[0].product_name} for a total of $${quantity * results[0].price}.`);
+                    readProducts();
+                } else {
+                    console.log(`\nSomething went wrong while processing your order. Order cancelled.`);
+                    readProducts();
+                }
+            });    
+        }
+    });
+}
 
+function checkStock(custQuantity, stockQuantity) {
+
+    if (custQuantity <= stockQuantity) {
+        return true;
+    } else {
+        return false;
     };
 
-}
+};
+
+function processOrder(itemID, custQuantity, stockQuantity, productName, eachPrice, callback) {
+    
+    let newQuantity = stockQuantity - custQuantity;
+
+    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id=?", [newQuantity, itemID], function (err, results) {
+        if (err) throw err;
+
+        // Console Log to notice if DB was updated
+        // console.log(results.affectedRows + " record(s) updated");
+
+        callback(null, true);
+    });
+
+};
 
 startApp();
