@@ -115,6 +115,63 @@ function viewLowInventory() {
 
 function addInventory() {
 
+    INQUIRER
+        .prompt([
+            {
+                type: "input",
+                name: "productID",
+                message: "Enter the product ID to add inventory:"
+            },
+            {
+                type: "input",
+                name: "quantity",
+                message: "Enter the product quantity to add to inventory:"
+            }
+        ]).then(function (res) {
+
+            let currentStock;
+            let updatedStock;
+            let productID = parseInt(res.productID);
+
+            var productsTable = new TABLE({
+                head: ["Item ID", "Old Quantity", "New Quantity"],
+                colWidths: [10, 15, 15]
+            });
+
+            connection.query("SELECT * FROM products WHERE item_id= ?", [productID], function (err, results) {
+
+                if (results.length === 0) {
+                    console.log(`\nThere is no product matching that ID.\n`);
+                    managerAction();
+                } else {
+
+
+                    currentStock = results[0].stock_quantity;
+                    updatedStock = currentStock + parseInt(res.quantity);
+
+                    connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?", [updatedStock, productID], function (err, results) {
+                        if (err) throw err;
+
+                        connection.query("SELECT * FROM products WHERE item_id= ?", [productID], function (err, results) {
+                            
+                            for (let i of Object.keys(results)) {
+                                console.log(`${results[i].item_id} ${currentStock} ${results[i].stock_quantity}`);
+                                productsTable.push([results[i].item_id, currentStock, results[i].stock_quantity]);
+                            };
+
+                            console.log(`\nProduct inventory updated.\n`);
+                            console.log(`\n${productsTable.toString()}\n`);
+
+                            managerAction();
+                        });
+
+                    });
+                }
+
+            });
+
+        });
+
 };
 
 function addProduct() {

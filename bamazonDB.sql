@@ -21,7 +21,7 @@ VALUES("Apple iPhone 8", "Electronics", 799.95, 28);
 
 -- dummy product three --
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES("Razer Laptop", "Electronics", 1459.59, 12);
+VALUES("Razer Laptop", "Electronics", 1459.59, 2);
 
 -- dummy product four --
 INSERT INTO products (product_name, department_name, price, stock_quantity)
@@ -33,7 +33,7 @@ VALUES("Charmin Toilet Paper 6-pack", "Toiletries", 12.98, 52);
 
 -- dummy product six --
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES("Puff's Ultra Soft Tissues", "Toiletries", 2.65, 30);
+VALUES("Puff's Ultra Soft Tissues", "Toiletries", 2.65, 5);
 
 -- dummy product seven --
 INSERT INTO products (product_name, department_name, price, stock_quantity)
@@ -49,7 +49,7 @@ VALUES("Standard Black Tee", "Clothing", 12.95, 240);
 
 -- dummy product ten --
 INSERT INTO products (product_name, department_name, price, stock_quantity)
-VALUES("Silver Ware Set", "Kitchen", 48.99, 18);
+VALUES("Silver Ware Set", "Kitchen", 48.99, 4);
 
 -- dummy product eleven --
 INSERT INTO products (product_name, department_name, price, stock_quantity)
