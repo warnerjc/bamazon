@@ -46,6 +46,40 @@ function customerAction() {
     INQUIRER
         .prompt([
             {
+                type: "list",
+                name: "action",
+                message: "What would you like to do?",
+                choices: ["Make a Purchase", "Exit Application"],
+                filter: function (val) {
+                    return val.toLowerCase();
+                }
+            }
+        ]).then(function (res) {
+
+            switch (res.action) {
+                case "make a purchase":
+                    getOrder();
+                    break;
+
+                case "exit application":
+                    console.log(`Bamazon Customer session ended.`);
+                    connection.end();
+                    break;
+
+                default:
+                    console.log(`Something went wrong. Let's try again.`);
+                    customerAction();
+            }
+
+        });
+
+}
+
+function getOrder() {
+
+    INQUIRER
+        .prompt([
+            {
                 type: "input",
                 name: "itemID",
                 message: "Enter the Item ID of the Product you'd like to purchase:"
@@ -57,34 +91,32 @@ function customerAction() {
             }
         ]).then(function (res) {
 
-            checkOrder(res.itemID, res.quantity);
+            let itemID = res.itemID;
+            let quantity = res.quantity;
+
+            connection.query("SELECT product_name, stock_quantity, price FROM products WHERE item_id=?", [itemID], function (err, results) {
+                if (err) throw err;
+
+                console.log(`\nPlease wait while we confirm your purchase: ${quantity} of ${results[0].product_name} for $${results[0].price} each.`);
+
+                if (!checkStock(quantity, results[0].stock_quantity)) {
+                    console.log(`\nUnfortunately, we don't have enough stock to fulfill your order.`);
+                    readProducts();
+                } else {
+                    processOrder(itemID, quantity, results[0].stock_quantity, results[0].product_name, results[0].price, function (err, res) {
+                        if (res) {
+                            console.log(`\nYour order was succesfully processed for ${quantity} of ${results[0].product_name} for a total of $${quantity * results[0].price}.`);
+                            readProducts();
+                        } else {
+                            console.log(`\nSomething went wrong while processing your order. Order cancelled.`);
+                            readProducts();
+                        }
+                    });
+                }
+            });
 
         });
 
-}
-
-function checkOrder(itemID, quantity) {
-
-    connection.query("SELECT product_name, stock_quantity, price FROM products WHERE item_id=?", [itemID], function (err, results) {
-        if (err) throw err;
-
-        console.log(`\nPlease wait while we confirm your purchase: ${quantity} of ${results[0].product_name} for $${results[0].price} each.`);
-
-        if (!checkStock(quantity, results[0].stock_quantity)) {
-            console.log(`\nUnfortunately, we don't have enough stock to fulfill your order.`);
-            readProducts();
-        } else {
-            processOrder(itemID, quantity, results[0].stock_quantity, results[0].product_name, results[0].price, function(err, res) {
-                if(res) { 
-                    console.log(`\nYour order was succesfully processed for ${quantity} of ${results[0].product_name} for a total of $${quantity * results[0].price}.`);
-                    readProducts();
-                } else {
-                    console.log(`\nSomething went wrong while processing your order. Order cancelled.`);
-                    readProducts();
-                }
-            });    
-        }
-    });
 }
 
 function checkStock(custQuantity, stockQuantity) {
@@ -98,7 +130,7 @@ function checkStock(custQuantity, stockQuantity) {
 };
 
 function processOrder(itemID, custQuantity, stockQuantity, productName, eachPrice, callback) {
-    
+
     let newQuantity = stockQuantity - custQuantity;
 
     connection.query("UPDATE products SET stock_quantity = ? WHERE item_id=?", [newQuantity, itemID], function (err, results) {

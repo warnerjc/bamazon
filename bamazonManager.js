@@ -28,7 +28,7 @@ function managerAction() {
                 type: "list",
                 name: "action",
                 message: "Welcome! What would you like to do?",
-                choices: ["View Products", "View Low Inventory", "Add Inventory", "Add Product"],
+                choices: ["View Products", "View Low Inventory", "Add Inventory", "Add Product", "Exit Application"],
                 filter: function (val) {
                     return val.toLowerCase();
                 }
@@ -50,6 +50,11 @@ function managerAction() {
 
                 case "add product":
                     addProduct();
+                    break;
+                
+                case "exit application":
+                    console.log(`Bamazon Manager session closed.`)
+                    connection.end();
                     break;
 
                 default:
@@ -153,7 +158,7 @@ function addInventory() {
                         if (err) throw err;
 
                         connection.query("SELECT * FROM products WHERE item_id= ?", [productID], function (err, results) {
-                            
+
                             for (let i of Object.keys(results)) {
                                 console.log(`${results[i].item_id} ${currentStock} ${results[i].stock_quantity}`);
                                 productsTable.push([results[i].item_id, currentStock, results[i].stock_quantity]);
@@ -175,6 +180,47 @@ function addInventory() {
 };
 
 function addProduct() {
+
+    INQUIRER
+        .prompt([
+            {
+                type: "input",
+                name: "productName",
+                message: "Enter the name of the new product to add:",
+            },
+            {
+                type: "input",
+                name: "departmentName",
+                message: "Enter the name of the department for the new product:",
+            },
+            {
+                type: "input",
+                name: "productPrice",
+                message: "Enter the selling price of the new product:",
+            },
+            {
+                type: "input",
+                name: "productQuantity",
+                message: "Enter the initial stock quantity of the new product:",
+            }
+        ]).then(function (res) {
+
+            let newProduct = {
+                product_name: res.productName,
+                department_name: res.departmentName,
+                price: res.productPrice,
+                stock_quantity: res.productQuantity
+            };
+
+            connection.query("INSERT INTO products SET ?", [newProduct], function (err, results) {
+                if (err) throw err;
+
+                console.log(`\nProduct succesfully added to products database.`);
+                viewProducts();
+
+            });
+            
+        });
 
 };
 
