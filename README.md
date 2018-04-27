@@ -10,7 +10,6 @@ SQL Database containing storefront Products
 4. price - current product price to customer
 5. stock_quantity - current product stock in store
 
-Use bamazonDB.sql as testing database:
 ![alt text][logo]
 
 [logo]: https://github.com/warnerjc/bamazon/blob/master/productsDB.PNG "Example Bamazon DB"
