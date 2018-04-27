@@ -37,7 +37,6 @@ function readProducts() {
         console.log(`\n${productsTable.toString()}`);
 
         customerAction();
-
     });
 
 };
