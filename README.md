@@ -13,7 +13,7 @@ SQL Database containing storefront Products
 Use bamazonDB.sql as testing database:
 ![alt text][logo]
 
-[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Example Bamazon DB"
+[logo]: https://github.com/warnerjc/bamazon/blob/master/productsDB.PNG "Example Bamazon DB"
 
 ## Customer View
 
