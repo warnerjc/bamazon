@@ -21,6 +21,7 @@ function startApp() {
 };
 
 function managerAction() {
+
     INQUIRER
         .prompt([
             {
@@ -32,9 +33,9 @@ function managerAction() {
                     return val.toLowerCase();
                 }
             }
-        ]).then (function (res) {
+        ]).then(function (res) {
 
-            switch(res.action) {
+            switch (res.action) {
                 case "view products":
                     viewProducts();
                     break;
@@ -74,7 +75,7 @@ function viewProducts() {
             productsTable.push([results[i].item_id, results[i].product_name, `$ ${results[i].price}`, results[i].stock_quantity]);
         };
 
-        console.log(`\n${productsTable.toString()}`);
+        console.log(`\n${productsTable.toString()}\n`);
 
         managerAction();
     });
@@ -82,6 +83,33 @@ function viewProducts() {
 };
 
 function viewLowInventory() {
+
+    let quantity = 5;
+
+    var productsTable = new TABLE({
+        head: ["Item ID", "Product Name", "Product Cost", "Quantity"],
+        colWidths: [10, 105, 15, 15]
+    });
+
+    connection.query("SELECT * FROM products WHERE stock_quantity <= ?", [quantity], function (err, results) {
+        if (err) throw err;
+
+        if (results.length === 0) {
+            console.log(`\nThere are no products below a stock quantity of 5\n`);
+
+            managerAction();
+        } else {
+
+            for (let i of Object.keys(results)) {
+                productsTable.push([results[i].item_id, results[i].product_name, `$ ${results[i].price}`, results[i].stock_quantity]);
+            };
+
+            console.log(`\nViewing all products equal to or below a quantity of ${quantity}.\n`);
+            console.log(`\n${productsTable.toString()}\n`);
+
+            managerAction();
+        }
+    });
 
 };
 
