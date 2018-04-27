@@ -9,3 +9,13 @@ SQL Database containing storefront Products
 3. department_name - department product is assigned to
 4. price - current product price to customer
 5. stock_quantity - current product stock in store
+
+Use bamazonDB.sql as testing database:
+![alt text][logo]
+
+[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Example Bamazon DB"
+
+## Customer View
+
+
+## Manager View
